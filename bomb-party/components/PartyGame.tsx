@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import Image from 'next/image';
 import Bomb from './Bomb';
 import { type Mode, type Prompt, prompts } from '@/data/prompts';
 import { duration, PromptDeck } from '@/lib/game';
@@ -116,25 +117,23 @@ export default function PartyGame() {
     if (audio.current) { audio.current.enabled = !next; if (!next) audio.current.unlock(); }
     savePreference('bomb-party-muted', String(next));
   }
-  const poolSize = prompts.filter(p => p.adult === (mode === 'adult')).length;
 
   return <main className={`shell ${phase === 'exploded' ? 'exploded' : ''} ${mode === 'adult' ? 'after-hours' : ''}`}>
     <header className="header">
-      <button className="wordmark" onClick={home} aria-label="Bomb Party home"><span className="logo-spark" aria-hidden="true">✳</span> BOMB PARTY</button>
+      <button className="wordmark" onClick={home} aria-label="Bomb Party home"><span className="brand-logo" aria-hidden="true"><Image src="/logo.png" alt="" width={56} height={56} /></span> BOMB PARTY</button>
       <button className="sound-button" onClick={toggleSound} aria-label={muted ? 'Unmute sound' : 'Mute sound'} aria-pressed={muted}>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z"/>{muted ? <path d="m16 9 6 6m0-6-6 6"/> : <><path d="M15 8a6 6 0 0 1 0 8"/><path d="M18 5a10 10 0 0 1 0 14"/></>}</svg>
       </button>
     </header>
     {phase === 'menu' ? <section className="menu-content">
-      <div className="menu-heading"><span className="eyebrow">ONE PHONE. EVERYONE PANICS.</span><h1>THINK FAST.<br/><span>PASS FASTER.</span></h1></div>
+      <div className="menu-heading"><h1>THINK FAST.<br/><span>PASS FASTER.</span></h1></div>
       <div className="hero-art"><Bomb/><span className="danger-sticker">NO TIMER.<br/>NO MERCY.</span><span className="hero-star" aria-hidden="true">✦</span></div>
       <p className="intro-copy">Say a new answer. Pass the phone.<br/>Holding it when it blows? You lose.</p>
-      <div className="mode-area"><span className="label">PICK YOUR CHAOS</span><div className="mode-toggle" role="group" aria-label="Game mode">
-        <button aria-pressed={mode === 'normal'} className={mode === 'normal' ? 'selected' : ''} onClick={() => savePreference('bomb-party-mode', 'normal')}>Normal<span>EVERYONE&apos;S INVITED</span></button>
-        <button aria-pressed={mode === 'adult'} className={mode === 'adult' ? 'selected' : ''} onClick={() => savePreference('bomb-party-mode', 'adult')}>21+ After hours<span>ZERO FILTER</span></button>
-      </div><p className="mode-note">{mode === 'normal' ? 'Quick answers. Friendly competition.' : 'Booty calls, dirty talk & horny disasters.'}<br/><span>{poolSize} prompts. A whole lot of bad timing.</span></p></div>
+      <div className="mode-area"><div className="mode-toggle" role="group" aria-label="Game mode">
+        <button aria-pressed={mode === 'normal'} className={mode === 'normal' ? 'selected' : ''} onClick={() => savePreference('bomb-party-mode', 'normal')}>Normal</button>
+        <button aria-pressed={mode === 'adult'} className={mode === 'adult' ? 'selected' : ''} onClick={() => savePreference('bomb-party-mode', 'adult')}>21+</button>
+      </div></div>
       <button className="action" onClick={start}>START GAME <span aria-hidden="true">↗</span></button>
-      <p className="setup-note">2+ PEOPLE <span>·</span> JUST PASS IT BY HAND</p>
     </section> : <section className={`game-content ${tense ? 'tense' : ''}`}>
       <div className="game-top"><button className="back-button" onClick={home}>← HOME</button><span className="round-label">ROUND {String(round).padStart(2, '0')} <span> / {mode === 'normal' ? 'NORMAL' : '21+'}</span></span></div>
       <div className="game-layout" key={round}>
@@ -147,6 +146,6 @@ export default function PartyGame() {
       </div>
       <div className="round-controls">{phase === 'exploded' ? <button className="action" onClick={start}>NEXT ROUND <span aria-hidden="true">↻</span></button> : <><p className="hands-note">No tapping needed. Just keep passing.</p><button className="skip-button" onClick={skip}><span aria-hidden="true">↻</span> SKIP QUESTION</button><p className="skip-note">Kills this round. New prompt, fresh fuse.</p></>}</div>
     </section>}
-    <footer>A LITTLE PANIC. A LOT OF LAUGHS.</footer>
+    <div className="footer-space" aria-hidden="true" />
   </main>;
 }

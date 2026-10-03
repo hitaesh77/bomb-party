@@ -15,16 +15,17 @@ button:focus-visible { outline: 3px solid var(--orange); outline-offset: 4px; }
 }
 .header { min-height: 74px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #24282225; gap: 12px; flex-shrink: 0; }
 .wordmark { border: 0; background: transparent; padding: 0; min-height: 44px; display: flex; align-items: center; gap: 8px; font-weight: 900; font-size: 17px; letter-spacing: -.7px; }
-.logo-spark { color: var(--orange); font-size: 31px; }
+.brand-logo { width: 28px; height: 32px; flex-shrink: 0; position: relative; }
+.brand-logo img { display: block; width: 40px; height: 40px; max-width: none; position: absolute; left: -8px; top: -4px; }
 .sound-button { background: transparent; border: 1px solid #24282240; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; flex-shrink: 0; }
 .sound-button svg { width: 20px; height: 20px; }
 .eyebrow, .label, .round-label, .setup-note, .turn-label, footer { font: 700 10px 'Courier New', monospace; letter-spacing: 1px; }
-.menu-content { flex: 1; display: flex; flex-direction: column; padding-top: 26px; }
-.menu-heading { text-align: center; }
+.menu-content { flex: 1; display: flex; flex-direction: column; padding: 26px 0 40px; }
+.menu-heading { text-align: center; padding-top: 28px; }
 .eyebrow { color: var(--muted); display: block; line-height: 1.5; }
 .menu-heading .eyebrow { font-size: 9px; }
 h1 { font-family: Impact, 'Arial Narrow', Arial, sans-serif; font-weight: 900; letter-spacing: -1.8px; }
-.menu-heading h1 { font-size: clamp(44px, 12.5vw, 64px); line-height: .99; margin: 15px 0 0; animation: enter .3s both; }
+.menu-heading h1 { font-size: clamp(44px, 12.5vw, 64px); line-height: .99; margin: 0; animation: enter .3s both; }
 h1 span { color: var(--orange); }
 .hero-art { position: relative; width: 100%; height: 190px; display: grid; place-items: center; margin: 3px 0; }
 .hero-art .bomb-art { width: 220px; }
@@ -32,7 +33,7 @@ h1 span { color: var(--orange); }
 .hero-star { position: absolute; color: var(--orange); font-size: 32px; left: 8%; top: 35px; transform: rotate(10deg); }
 .danger-sticker { position: absolute; right: 0; bottom: 26px; padding: 10px 13px; background: #e4eb7b; border: 2px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); transform: rotate(9deg); font-weight: 900; font-size: 11px; line-height: 1.3; }
 .intro-copy { text-align: center; font-size: 14px; line-height: 1.5; margin: 0 0 24px; color: var(--muted); }
-.mode-area { margin-top: auto; }
+.mode-area { margin-top: auto; padding: 20px 0 68px; }
 .label { display: block; margin-bottom: 9px; font-size: 9px; }
 .mode-toggle { display: flex; gap: 4px; padding: 4px; border: 1.5px solid var(--ink); border-radius: 13px; }
 .mode-toggle button { flex: 1; min-width: 0; min-height: 61px; border: 0; background: transparent; padding: 10px 4px; border-radius: 8px; font-size: 14px; font-weight: 800; }
@@ -47,6 +48,7 @@ h1 span { color: var(--orange); }
 .setup-note { text-align: center; color: var(--muted); font-size: 8px; margin: 20px 0 5px; }
 .setup-note span { padding: 0 5px; }
 footer { color: var(--muted); font-size: 8px; text-align: center; padding: 18px 0 16px; flex-shrink: 0; }
+.footer-space { height: 43px; flex-shrink: 0; }
 .game-content { display: flex; flex-direction: column; flex: 1; padding-top: 13px; }
 .game-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .back-button { border: 0; background: none; font: 700 10px 'Courier New', monospace; min-height: 44px; padding: 0 8px 0 0; }
@@ -95,6 +97,8 @@ footer { color: var(--muted); font-size: 8px; text-align: center; padding: 18px 
 @media (max-height: 740px) {
   .header { min-height: 64px; }
   .menu-content { padding-top: 16px; }
+  .mode-area { padding-bottom: 62px; }
+  .footer-space { height: 33px; }
   .hero-art { height: 150px; }
   .hero-art .bomb-art { width: 180px; }
   .hero-art::before { width: 130px; height: 130px; }
