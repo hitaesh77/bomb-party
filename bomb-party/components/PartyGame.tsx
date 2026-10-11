@@ -3,9 +3,10 @@
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import Image from 'next/image';
 import Bomb from './Bomb';
-import { type Mode, type Prompt, prompts } from '@/data/prompts';
+import { type Mode, type Prompt } from '@/data/prompts';
 import { duration, PromptDeck } from '@/lib/game';
 import { GameAudio } from '@/lib/audio';
+import settings from '@/game-settings.json';
 
 type Phase = 'menu' | 'playing' | 'exploded';
 function subscribePreferences(callback: () => void) {
@@ -21,7 +22,7 @@ function savePreference(key: string, value: string) {
 
 export default function PartyGame() {
   const [phase, setPhase] = useState<Phase>('menu');
-  const mode: Mode = useSyncExternalStore(subscribePreferences, () => readPreference('bomb-party-mode') === 'adult' ? 'adult' : 'normal', () => 'normal');
+  const mode: Mode = useSyncExternalStore(subscribePreferences, () => settings.show21Plus === true && readPreference('bomb-party-mode') === 'adult' ? 'adult' : 'normal', () => 'normal');
   const muted = useSyncExternalStore(subscribePreferences, () => readPreference('bomb-party-muted') === 'true', () => false);
   const [prompt, setPrompt] = useState<Prompt | null>(null);
   const [round, setRound] = useState(0);
@@ -131,7 +132,7 @@ export default function PartyGame() {
       <p className="intro-copy">Say a new answer. Pass the phone.<br/>Holding it when it blows? You lose.</p>
       <div className="mode-area"><div className="mode-toggle" role="group" aria-label="Game mode">
         <button aria-pressed={mode === 'normal'} className={mode === 'normal' ? 'selected' : ''} onClick={() => savePreference('bomb-party-mode', 'normal')}>Normal</button>
-        <button aria-pressed={mode === 'adult'} className={mode === 'adult' ? 'selected' : ''} onClick={() => savePreference('bomb-party-mode', 'adult')}>21+</button>
+        {settings.show21Plus === true && <button aria-pressed={mode === 'adult'} className={mode === 'adult' ? 'selected' : ''} onClick={() => savePreference('bomb-party-mode', 'adult')}>21+</button>}
       </div></div>
       <button className="action" onClick={start}>START GAME <span aria-hidden="true">↗</span></button>
     </section> : <section className={`game-content ${tense ? 'tense' : ''}`}>

@@ -17,15 +17,22 @@ global.localStorage={getItem:key=>preferences.get(key)??null,setItem:(key,value)
 const listeners=new Map();global.window={addEventListener:(key,callback)=>listeners.set(key,callback),removeEventListener:()=>{},dispatchEvent:()=>{}};global.document={addEventListener:()=>{},removeEventListener:()=>{}};
 const react={useState(initial){const i=cursor++;if(!(i in slots))slots[i]=initial;return [slots[i],value=>{slots[i]=typeof value==='function'?value(slots[i]):value;}];},useRef(initial){const i=cursor++;if(!(i in slots))slots[i]={current:initial};return slots[i];},useCallback(fn){return fn;},useEffect(fn){if(!mounted)effects.push(fn);},useSyncExternalStore(subscribe,snapshot){return snapshot();}};
 const jsx={jsx:(type,props)=>({type,props}),jsxs:(type,props)=>({type,props}),Fragment:'fragment'};
+const settings=JSON.parse(fs.readFileSync('game-settings.json','utf8'));
+assert.equal(typeof settings.show21Plus,'boolean');
+const configuredShow21Plus=settings.show21Plus;
+settings.show21Plus=false;
 const source=ts.transpileModule(fs.readFileSync('components/PartyGame.tsx','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX}}).outputText;
-const component={exports:{}};new Function('require','module','exports',source)(name=>({'react':react,'react/jsx-runtime':jsx,'./Bomb':()=>null,'@/data/prompts':data,'@/lib/game':{duration:()=>40000,PromptDeck},'@/lib/audio':{GameAudio:class{unlock(){}play(){}close(){}}}}[name]),component,component.exports);
+const component={exports:{}};new Function('require','module','exports',source)(name=>({'react':react,'react/jsx-runtime':jsx,'./Bomb':{default:()=>null},'next/image':{default:()=>null},'@/game-settings.json':{default:settings},'@/data/prompts':data,'@/lib/game':{duration:()=>40000,PromptDeck},'@/lib/audio':{GameAudio:class{unlock(){}play(){}close(){}}}}[name]),component,component.exports);
 function render(){cursor=0;return component.exports.default();}
 function find(node, predicate){if(!node||typeof node!=='object')return null;if(predicate(node))return node;for(const child of [node.props?.children].flat(Infinity)){const match=find(child,predicate);if(match)return match;}return null;}
 function button(tree,text){return find(tree,node=>node.type==='button'&&[node.props.children].flat().some(child=>typeof child==='string'&&child.includes(text)));}
-let tree=render();const cleanups=effects.map(fn=>fn());mounted=true;
+preferences.set('bomb-party-mode','adult');
+let tree=render();assert.equal(button(tree,'21+'),null);assert.equal(button(tree,'Normal').props['aria-pressed'],true);
+const cleanups=effects.map(fn=>fn());mounted=true;
 // Strict Mode's setup/cleanup/setup replay must not schedule a round.
 cleanups.forEach(fn=>fn?.());effects.forEach(fn=>fn());assert.equal(scheduled.size,0);
 button(tree,'START GAME').props.onClick();tree=render();assert.equal(scheduled.size,2);
+assert(normal.some(p=>p.text===find(tree,n=>n.type==='h1').props.children.props.children[0]));
 const originalDeadline=Math.max(...[...scheduled.values()].map(timer=>timer.due));
 assert.equal(button(tree,'ANSWERED, PASS IT'),null);
 const oldPrompt=find(tree,n=>n.type==='h1').props.children;
@@ -43,6 +50,11 @@ assert.equal(Math.max(...[...scheduled.values()].map(timer=>timer.due)),replacem
 now=replacementDeadline;const boom=[...scheduled.values()].find(timer=>timer.due===replacementDeadline);boom.callback();tree=render();assert(button(tree,'NEXT ROUND'));assert.equal(scheduled.size,0);
 for(let round=0;round<5;round++){const next=button(tree,'NEXT ROUND');next.props.onClick();next.props.onClick();assert.equal(scheduled.size,2);const end=Math.max(...[...scheduled.values()].map(timer=>timer.due));now=end;[...scheduled.values()].find(timer=>timer.due===end).callback();tree=render();}
 button(tree,'NEXT ROUND').props.onClick();tree=render();button(tree,'HOME').props.onClick();assert.equal(scheduled.size,0);tree=render();assert(button(tree,'START GAME'));
-const adultButton=button(tree,'21+ After hours');adultButton.props.onClick();assert.equal(preferences.get('bomb-party-mode'),'adult');tree=render();assert.equal(button(tree,'21+ After hours').props['aria-pressed'],true);
+settings.show21Plus=true;tree=render();
+const adultButton=button(tree,'21+');adultButton.props.onClick();assert.equal(preferences.get('bomb-party-mode'),'adult');tree=render();assert.equal(button(tree,'21+').props['aria-pressed'],true);
+button(tree,'START GAME').props.onClick();tree=render();assert(adult.some(p=>p.text===find(tree,n=>n.type==='h1').props.children.props.children[0]));
+button(tree,'HOME').props.onClick();settings.show21Plus=false;tree=render();assert.equal(button(tree,'21+'),null);assert.equal(button(tree,'Normal').props['aria-pressed'],true);
+settings.show21Plus=configuredShow21Plus;
 cleanups.forEach(fn=>fn?.());Date.now=realNow;global.setTimeout=realSetTimeout;global.clearTimeout=realClearTimeout;
 console.log('Passed: Strict Mode lifecycle, hands-only passing, skip restart/debounce, stale callback protection, explosion cleanup, repeated rounds, double-start protection, home cleanup, mode persistence.');
+console.log('Passed: 21+ flag hides the option, overrides saved adult mode, serves Normal prompts when disabled, and restores adult play when enabled.');

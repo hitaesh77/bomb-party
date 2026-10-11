@@ -17,7 +17,24 @@ The interface is designed as a portrait phone game, including safe-area spacing 
 
 ## Play
 
-Choose Normal or 21+ After Hours, then start. Give a fresh answer out loud and pass the phone by hand. There is no pass button. Whoever holds it when the bomb explodes loses. Start the next round immediately.
+Choose a mode, then start. Normal is always available; 21+ After Hours is hidden by default (see the phone toggle below). Give a fresh answer out loud and pass the phone by hand. There is no pass button. Whoever holds it when the bomb explodes loses. Start the next round immediately.
+
+## Toggle 21+ from your phone
+
+Edit **`bomb-party/game-settings.json`** in this repository:
+
+```json
+{
+  "show21Plus": false
+}
+```
+
+- Change `false` to `true` to show the 21+ option.
+- Change it back to `false` to hide it and force Normal mode, even on phones with a previously saved 21+ preference.
+
+Commit the edit to the branch connected to your production deployment. You can use GitHub's file editor in your phone browser if the mobile app does not offer editing. With Vercel Git integration enabled, wait for the new production deployment to succeed, then reload the game. This switches the option for everyone visiting that deployment. Already-open games keep their current version until reloaded.
+
+The setting is included at build time; the app does not continuously watch GitHub or the README. No API keys or additional services are required. This controls the interface and game mode, not access to the adult prompt source files.
 
 - S: skip a question during play (cancels the current round and starts a new prompt with a fresh timer)
 - N: next round after an explosion
